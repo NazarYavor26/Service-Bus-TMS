@@ -1,5 +1,5 @@
 <h1>Task Management System with Service Bus Integration</h1>
-<h2>Welcome to the TaskBot Project! 🚀</h2>
+<h2>Welcome to the Service Bus TMS Project! 🚀</h2>
 
 <h3>Overview</h3>
 TaskBot is a powerful Task Management System built using C# and .NET, featuring seamless integration with the RabbitMQ service bus. It empowers you to effortlessly manage your tasks with real-time updates.
