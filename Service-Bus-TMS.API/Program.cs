@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Service_Bus_TMS.API.Middlewares;
 using Service_Bus_TMS.BLL;
 
@@ -5,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string serviceBusTMSPolicy = "Service-Bus-TMSPolicy";
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddCors(options => options.AddPolicy(serviceBusTMSPolicy, policyBuilder =>
 {

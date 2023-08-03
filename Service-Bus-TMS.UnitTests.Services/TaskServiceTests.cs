@@ -28,7 +28,7 @@ public class TaskServiceTests
     public void AddTask_ValidTask_SuccessfullyAddedAndSent()
     {
         // Arrange
-        var taskModel = new TaskModel();
+        var taskModel = new TaskAdd();
 
         // Act
         _taskService.AddTask(taskModel);

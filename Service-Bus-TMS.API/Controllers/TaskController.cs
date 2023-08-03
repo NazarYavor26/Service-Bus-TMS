@@ -16,21 +16,21 @@ public class TaskController : ControllerBase
     }
     
     [HttpPost]
-    public IActionResult AddTask(TaskModel taskModel)
+    public IActionResult AddTask([FromForm]TaskAdd taskAdd)
     {
-        _taskService.AddTask(taskModel);
+        _taskService.AddTask(taskAdd);
         return Ok();
     }
 
     [HttpPut]
-    public IActionResult UpdateTaskStatus(TaskUpdate taskUpdate)
+    public IActionResult UpdateTaskStatus([FromForm]TaskUpdate taskUpdate)
     {
         var updatedTask = _taskService.UpdateTask(taskUpdate);
         return Ok(updatedTask);
     }
     
     [HttpGet]
-    public ActionResult<List<TaskModel>> GetAllTasks()
+    public ActionResult<List<TaskAdd>> GetAllTasks()
     {
         var tasks = _taskService.GetAllTasks();
         return Ok(new { tasks.Count, tasks });

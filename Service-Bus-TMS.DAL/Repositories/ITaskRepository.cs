@@ -12,4 +12,7 @@ public interface ITaskRepository
     Task GetById(int id);
 
     List<Task> GetAll();
+    
+    Task GetLast();
+
 }
