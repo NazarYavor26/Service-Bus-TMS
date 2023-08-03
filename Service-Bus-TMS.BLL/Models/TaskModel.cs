@@ -1,4 +1,5 @@
-﻿using Service_Bus_TMS.DAL.Enums;
+﻿using Newtonsoft.Json;
+using Service_Bus_TMS.DAL.Enums;
 
 namespace Service_Bus_TMS.BLL.Models;
 

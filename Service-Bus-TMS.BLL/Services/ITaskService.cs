@@ -5,7 +5,7 @@ namespace Service_Bus_TMS.BLL.Services;
 
 public interface ITaskService
 {
-    void AddTask(TaskModel task);
+    void AddTask(TaskAdd task);
 
     TaskModel UpdateTask(TaskUpdate task);
 

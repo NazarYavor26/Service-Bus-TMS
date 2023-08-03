@@ -18,10 +18,10 @@ public class TaskService : ITaskService
         _taskRepository = taskRepository;
     }
     
-    public void AddTask(TaskModel task)
+    public void AddTask(TaskAdd task)
     {
         _taskRepository.Add(task.ToEntitie());
-        _serviceBusHandler.SendMessage(task.ToEntitie());
+        _serviceBusHandler.SendMessage(_taskRepository.GetLast());
     }
 
     public TaskModel UpdateTask(TaskUpdate task)
@@ -31,6 +31,7 @@ public class TaskService : ITaskService
         if (taskUpdate != null && taskUpdate.ReceiveStatus != ReceiveStatus.Received)
         {
             taskUpdate.Status = task.NewStatus;
+            _taskRepository.SaveChanges();
             _serviceBusHandler.SendMessage(taskUpdate);
         }
 
@@ -41,13 +42,17 @@ public class TaskService : ITaskService
     {
         var allTasksFromQueue = _serviceBusHandler.ReceiveMessage().Select(task => task.ToModel()).ToList();
         MarkAsReceived();
-        
+
         return allTasksFromQueue;
     }
 
     private void MarkAsReceived()
     {
-        _taskRepository.GetAll().Select(task => task.ReceiveStatus = ReceiveStatus.Received);
+        foreach (var task in _taskRepository.GetAll().Where(task => task.ReceiveStatus != ReceiveStatus.Received))
+        {
+            task.ReceiveStatus = ReceiveStatus.Received;
+        }
+        
         _taskRepository.SaveChanges();
     }
 }
