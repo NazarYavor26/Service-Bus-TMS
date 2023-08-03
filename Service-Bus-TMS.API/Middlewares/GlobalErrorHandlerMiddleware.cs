@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Service_Bus_TMS.API.Exceptions;
+using Service_Bus_TMS.BLL.Exceptions;
 
 namespace Service_Bus_TMS.API.Middlewares;
 
@@ -31,15 +31,18 @@ public class GlobalErrorHandlerMiddleware
 
         string message = "An error occurred while processing your request.";
 
-        if (exception is NotFoundException)
+        switch (exception)
         {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            message = exception.Message;
-        }
-        else if (exception is BadRequestException)
-        {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            message = exception.Message;
+            case NotFoundException:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                message = exception.Message;
+                break;
+            
+            case BadRequestException:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                message = exception.Message;
+                break;
+
         }
 
         var result = JsonConvert.SerializeObject(new { error = message });

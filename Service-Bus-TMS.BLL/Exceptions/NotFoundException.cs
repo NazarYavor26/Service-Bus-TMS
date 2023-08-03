@@ -1,4 +1,6 @@
-﻿namespace Service_Bus_TMS.API.Exceptions;
+﻿using System;
+
+namespace Service_Bus_TMS.BLL.Exceptions;
 
 public class NotFoundException : Exception
 {
