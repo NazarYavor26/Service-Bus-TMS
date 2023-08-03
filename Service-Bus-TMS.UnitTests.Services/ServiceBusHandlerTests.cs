@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using Moq;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+﻿using NUnit.Framework;
 using Service_Bus_TMS.BLL.Services;
 using Service_Bus_TMS.DAL.Entities;
 
@@ -13,79 +7,90 @@ namespace Service_Bus_TMS.UnitTests.Services;
 [TestFixture]
 public class ServiceBusHandlerTests
 {
-    private Mock<IModel> _mockChannel;
-    private Mock<IConnection> _mockConnection;
     private ServiceBusHandler _serviceBusHandler;
 
     [SetUp]
     public void Setup()
     {
-        _mockChannel = new Mock<IModel>();
-        _mockConnection = new Mock<IConnection>();
-        _mockConnection.Setup(c => c.CreateModel()).Returns(_mockChannel.Object);
-
-        var mockConnectionFactory = new Mock<IConnectionFactory>();
-        mockConnectionFactory.Setup(f => f.CreateConnection()).Returns(_mockConnection.Object);
-
-        _serviceBusHandler = new ServiceBusHandler();
+        _serviceBusHandler = new ServiceBusHandler("testQueue");
     }
 
     [Test]
-    public void SendMessage_ValidTask_SendsMessage()
+    public void SendMessage_ShouldSendMessage()
     {
         // Arrange
         var task = new Task();
 
+        // Act & Assert
+        Assert.DoesNotThrow(() => _serviceBusHandler.SendMessage(task));
+    }
+    
+    [Test]
+    public void SendMessage_NullTask_DoesNotThrowException()
+    {
+        // Act & Assert
+        Assert.DoesNotThrow(() => _serviceBusHandler.SendMessage(null));
+    }
+    
+    [Test]
+    public void SendAndReceiveMessage_Should_SendAndReceive()
+    {
+        // Arrange
+
+        var serviceBusHandler = new ServiceBusHandler("sendAndReceiveQueue");
+        var task = new Task { TaskID = 1, TaskName = "Test Task" };
+
         // Act
-        _serviceBusHandler.SendMessage(task);
+        serviceBusHandler.SendMessage(task);
+        var receivedTasks = serviceBusHandler.ReceiveMessage();
 
         // Assert
-        _mockChannel.Verify(c => c.BasicPublish(
-            It.IsAny<string>(), 
-            It.IsAny<string>(), 
-            It.IsAny<bool>(), 
-            It.IsAny<IBasicProperties>(), 
-            It.IsAny<byte[]>()), 
-            Times.Once);
+        Assert.That(receivedTasks, Has.Count.EqualTo(1));
     }
 
     [Test]
     public void ReceiveMessage_NoMessages_ReturnsEmptyList()
     {
+        // Arrange
+        var serviceBusHandler = new ServiceBusHandler();
+
         // Act
-        var result = _serviceBusHandler.ReceiveMessage();
+        var receivedTasks = serviceBusHandler.ReceiveMessage();
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.That(receivedTasks, Is.Empty);
     }
-
+    
     [Test]
-    public void ReceiveMessage_WithMessages_ReturnsListOfTasks()
+    public void ReceiveMessage_ReceiveSingleMessage_ReturnsListWithOneTask()
     {
         // Arrange
-        var tasks = new List<Task>
-        {
-            new(),
-            new()
-        };
-
-        var messageBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(tasks[0]));
-        var eventArgs = new BasicDeliverEventArgs("tag", 1, false, "exchange", "routingKey", null, messageBytes);
-
-        _mockChannel.Setup(c => c.BasicConsume(
-                It.IsAny<string>(),
-                It.IsAny<bool>(),
-                It.IsAny<string>(),
-                It.IsAny<IBasicConsumer>()))
-            .Callback<string, bool, string, IBasicConsumer>((queue, autoAck, consumerTag, consumer) =>
-            {
-                consumer.HandleBasicDeliver("consumerTag", 1, false, "exchange", "routingKey", null, messageBytes);
-            });
+        var task = new Task();
+        _serviceBusHandler.SendMessage(task);
 
         // Act
-        var result = _serviceBusHandler.ReceiveMessage();
+        var receivedTasks = _serviceBusHandler.ReceiveMessage();
 
         // Assert
-        Assert.That(result.Count, Is.EqualTo(tasks.Count));
+        Assert.That(receivedTasks, Has.Count.EqualTo(1));
+    }
+    
+    [Test]
+    public void ReceiveMessage_ReceiveMultipleMessages_ReturnsListWithCorrectCount()
+    {
+        // Arrange
+        _serviceBusHandler = new ServiceBusHandler("receiveMultipleMessagesQueue");
+        const int taskCount = 5;
+        
+        for (int i = 0; i < taskCount; i++)
+        {
+            _serviceBusHandler.SendMessage(new Task());
+        }
+
+        // Act
+        var receivedTasks = _serviceBusHandler.ReceiveMessage();
+
+        // Assert
+        Assert.That(receivedTasks, Has.Count.EqualTo(taskCount));
     }
 }
