@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Service-Bus-TMS.BLL\Service-Bus-TMS.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Exceptions\BadRequestException.cs" />
+  </ItemGroup>
+
 </Project>
