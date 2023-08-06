@@ -34,4 +34,9 @@ public class TaskRepository : ITaskRepository
     {
         return _db.Tasks.ToList();
     }
+    
+    public Task GetLast()
+    {
+        return _db.Tasks.OrderByDescending(task => task.TaskID).FirstOrDefault();
+    }   
 }

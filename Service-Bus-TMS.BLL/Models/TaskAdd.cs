@@ -1,8 +1,8 @@
 ﻿using Service_Bus_TMS.DAL.Enums;
 
-namespace Service_Bus_TMS.DAL.Entities;
+namespace Service_Bus_TMS.BLL.Models;
 
-public class Task
+public class TaskAdd
 {
     public int TaskID { get; set; }
     
@@ -13,6 +13,4 @@ public class Task
     public TaskStatus Status { get; set; }
     
     public string AssignedTo { get; set; }
-
-    public ReceiveStatus ReceiveStatus { get; set; } = ReceiveStatus.NotReceived;
 }

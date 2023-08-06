@@ -7,15 +7,14 @@ namespace Service_Bus_TMS.BLL.Utilities;
 
 public static class Mapper
 {
-    public static Task ToEntitie(this TaskModel taskModel)
+    public static Task ToEntitie(this TaskAdd taskAdd)
     {
         return new Task
         {
-            TaskID = taskModel.TaskID,
-            TaskName = taskModel.TaskName,
-            Description = taskModel.Description,
-            Status = taskModel.Status,
-            AssignedTo = taskModel.AssignedTo
+            TaskName = taskAdd.TaskName,
+            Description = taskAdd.Description,
+            Status = taskAdd.Status,
+            AssignedTo = taskAdd.AssignedTo
         };
     }
     
