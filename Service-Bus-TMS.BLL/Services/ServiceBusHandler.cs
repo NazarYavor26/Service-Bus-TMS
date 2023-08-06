@@ -11,8 +11,13 @@ namespace Service_Bus_TMS.BLL.Services;
 
 public class ServiceBusHandler : IServiceBusHandler
 {
-    private const string QUEUE_NAME = "dev-queue1";
+    private readonly string _queueName;
     private const int MILLISECONDS_DELAY_RECEIVE = 500;
+
+    public ServiceBusHandler(string queueName = "queueName")
+    {
+        _queueName = queueName;
+    }
     
     public void SendMessage(Task task)
     {
@@ -22,7 +27,7 @@ public class ServiceBusHandler : IServiceBusHandler
         using var channel = connection.CreateModel();
         
         channel.QueueDeclare(
-            queue: QUEUE_NAME,
+            queue: _queueName,
             durable: false,
             exclusive: false,
             autoDelete: false,
@@ -34,7 +39,7 @@ public class ServiceBusHandler : IServiceBusHandler
 
         channel.BasicPublish(
             exchange: "",
-            routingKey: QUEUE_NAME,
+            routingKey: _queueName,
             basicProperties: null,
             body: body);
     }
@@ -48,7 +53,7 @@ public class ServiceBusHandler : IServiceBusHandler
         using var channel = connection.CreateModel();
         
         channel.QueueDeclare(
-            queue: QUEUE_NAME,
+            queue: _queueName,
             durable: false,
             exclusive: false,
             autoDelete: false,
@@ -66,7 +71,7 @@ public class ServiceBusHandler : IServiceBusHandler
         
         
         channel.BasicConsume(
-            queue: QUEUE_NAME,
+            queue: _queueName,
             autoAck: true,
             consumer: consumer);
         
@@ -74,7 +79,7 @@ public class ServiceBusHandler : IServiceBusHandler
         {
             Thread.Sleep(MILLISECONDS_DELAY_RECEIVE);
             
-            var messageCount = channel.MessageCount(QUEUE_NAME);
+            var messageCount = channel.MessageCount(_queueName);
             if (messageCount == 0)
             {
                 break;
