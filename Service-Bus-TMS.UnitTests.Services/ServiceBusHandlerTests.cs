@@ -66,6 +66,7 @@ public class ServiceBusHandlerTests
     {
         // Arrange
         var task = new Task();
+        var _serviceBusHandler = new ServiceBusHandler("receiveSingleMessageQueue");
         _serviceBusHandler.SendMessage(task);
 
         // Act
